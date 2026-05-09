@@ -28,6 +28,11 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
         return new String[]{"/"};
     }
  
+
+    @Override
+    protected String getServletName() {
+        return "dispatcher";
+    }
     @Override
     protected void customizeRegistration(ServletRegistration.Dynamic registration) {
 
