@@ -21,51 +21,56 @@ import jakarta.persistence.EntityManagerFactory;
 @Configuration
 @EnableTransactionManagement
 @ComponentScan("com.learnify")
-@EnableJpaRepositories("com.learnify.repository") 
+@EnableJpaRepositories("com.learnify.repository")
 public class HibernateConfig {
-	
-	@Bean
-	public DataSource dataSource() {
-		HikariDataSource hds = new HikariDataSource();
-		hds.setJdbcUrl("jdbc:mysql://localhost:3306/learnify");
-		hds.setDriverClassName("com.mysql.cj.jdbc.Driver");
-		hds.setUsername("root");
-		hds.setPassword("root");
-		return hds;
-	}
-	
-	@Bean
-	public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource ds) {
-			LocalContainerEntityManagerFactoryBean lcem = new LocalContainerEntityManagerFactoryBean();
-			lcem.setDataSource(ds);
-			lcem.setPackagesToScan("com.learnify.entity");
-			lcem.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-			
-			Properties properties = new Properties();
-			properties.put("hibernate.hbm2ddl.auto","update");
-			properties.put("hibernate.show_sql",true);
-			properties.put("hibernate.format_sql",true);
-			properties.put("hibernate.dialect","org.hibernate.dialect.MySQL8Dialect");
-			
-			lcem.setJpaProperties(properties);
-			return lcem;
-	}
-	
-	@Bean
-	public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
-		return new JpaTransactionManager(emf);
-	}
-	
+
+    @Bean
+    public DataSource dataSource() {
+
+        HikariDataSource hds = new HikariDataSource();
+
+        // ENV values (Render)
+        String url = System.getenv("DB_URL");
+        String user = System.getenv("DB_USER");
+        String pass = System.getenv("DB_PASS");
+
+        // fallback (Localhost)
+        hds.setJdbcUrl(url != null ? url
+                : "jdbc:mysql://localhost:3306/learnify");
+
+        hds.setUsername(user != null ? user : "root");
+        hds.setPassword(pass != null ? pass : "root");
+
+        hds.setDriverClassName("com.mysql.cj.jdbc.Driver");
+
+        return hds;
+    }
+
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource ds) {
+
+        LocalContainerEntityManagerFactoryBean lcem =
+                new LocalContainerEntityManagerFactoryBean();
+
+        lcem.setDataSource(ds);
+        lcem.setPackagesToScan("com.learnify.entity");
+        lcem.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+
+        Properties properties = new Properties();
+
+        properties.put("hibernate.hbm2ddl.auto", "update");
+        properties.put("hibernate.show_sql", true);
+        properties.put("hibernate.format_sql", true);
+        properties.put("hibernate.dialect",
+                "org.hibernate.dialect.MySQL8Dialect");
+
+        lcem.setJpaProperties(properties);
+
+        return lcem;
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(EntityManagerFactory emf) {
+        return new JpaTransactionManager(emf);
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
